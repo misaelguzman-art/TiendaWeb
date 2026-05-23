@@ -11,8 +11,8 @@ import {RouterLink} from '@angular/router';
 })
 export class Productos {
   private api = inject(ApiClient);
-  private url = 'http://localhost:5056/GestionProductos';
-
+  private url = 'http://localhost:5056/GestionProductos'; //si el puerto de dotnet es diferente cambiar aquI
+  //SPA UNA SOLA PAGINA
   productos: Producto[] = [];
 
   ngOnInit() {
