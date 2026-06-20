@@ -1,30 +1,100 @@
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="mb-3">
-          <label class="form-label">Código</label>
-          <input type="text" class="form-control">
+<div class="container py-5">
+  <!-- Vista de detalles del producto (cuando se está viendo un producto) -->
+  <div *ngIf="esEdicion && producto.id > 0" class="row">
+    <div class="col-md-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h2 class="card-title mb-3">
+            {{ producto.nombre }}
+            <span *ngIf="producto.categoriaId === -1" class="badge bg-danger ms-2 fs-5">VENDIDO</span>
+          </h2>
+          <p class="card-text text-muted fs-5">{{ producto.descripcion }}</p>
+          
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <p><strong>Plataforma:</strong> {{ producto.plataforma || 'N/A' }}</p>
+              <p><strong>Duración:</strong> {{ producto.duracionDias }} días</p>
+            </div>
+            <div class="col-md-6">
+              <h3 class="text-primary">${{ producto.precio }}</h3>
+              <button class="btn btn-success btn-lg" routerLink="/productos">
+                ← Volver a Productos
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div class="mb-3">
-          <label class="form-label">Nombre</label>
-          <input type="text" class="form-control">
-        </div>
+      <!-- Componente de comentarios -->
+      <app-comentarios 
+        [productoId]="producto.id" 
+        [username]="username">
+      </app-comentarios>
+    </div>
+  </div>
 
-        <div class="mb-3">
-          <label class="form-label">Descripción</label>
-          <input type="text" class="form-control">
+  <!-- Vista de crear/editar producto (cuando no estamos viendo un producto) -->
+  <div *ngIf="!esEdicion || producto.id === 0" class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">{{ esEdicion ? 'Editar Producto' : 'Nuevo Producto' }}</h3>
         </div>
+        <div class="card-body">
+          <!-- Mensaje de estado -->
+          <div *ngIf="mensaje" [class]="mensajeError ? 'alert alert-danger' : 'alert alert-success'">
+            {{ mensaje }}
+          </div>
 
-        <div class="mb-3">
-          <label class="form-label">Precio</label>
-          <input type="number" class="form-control">
-        </div>
+          <form (ngSubmit)="guardarProducto()">
+            <!-- ID (solo visible en edición) -->
+            <div class="mb-3" *ngIf="esEdicion">
+              <label class="form-label fw-bold">ID</label>
+              <input type="text" class="form-control" [value]="producto.id" disabled>
+            </div>
 
-        <div class="text-center">
-          <button type="submit" class="btn btn-primary">Guardar</button>
-          <button type="button" class="btn btn-secondary" routerLink="/productos">Cancelar</button>
+            <!-- Nombre -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Nombre</label>
+              <input type="text" class="form-control" [(ngModel)]="producto.nombre" name="nombre" required>
+            </div>
+
+            <!-- Descripción -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Descripción</label>
+              <input type="text" class="form-control" [(ngModel)]="producto.descripcion" name="descripcion">
+            </div>
+
+            <!-- Precio -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Precio ($)</label>
+              <input type="number" class="form-control" [(ngModel)]="producto.precio" name="precio" required min="0">
+            </div>
+
+            <!-- Plataforma -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Plataforma</label>
+              <input type="text" class="form-control" [(ngModel)]="producto.plataforma" name="plataforma" placeholder="Ej: Netflix, HBO, Spotify">
+            </div>
+
+            <!-- Duración -->
+            <div class="mb-4">
+              <label class="form-label fw-bold">Duración (Días)</label>
+              <input type="number" class="form-control" [(ngModel)]="producto.duracionDias" name="duracionDias" min="1">
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary flex-grow-1">
+                {{ esEdicion ? 'Actualizar' : 'Guardar' }}
+              </button>
+              <button type="button" class="btn btn-secondary" routerLink="/productos">
+                Cancelar
+              </button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
   </div>
 </div>

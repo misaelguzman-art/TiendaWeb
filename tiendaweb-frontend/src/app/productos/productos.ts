@@ -1,32 +1,112 @@
-import {Component, inject} from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink, Router } from '@angular/router';
 import { ApiClient } from '../core/http/api-client';
-import {RouterLink} from '@angular/router';
-
-@Component({
-  selector: 'app-productos',
-  imports: [
-    RouterLink
-  ],
-  templateUrl: './productos.html',
-})
-export class Productos {
-  private api = inject(ApiClient);
-  private url = 'http://localhost:5056/GestionProductos'; //si el puerto de dotnet es diferente cambiar aquI
-  //SPA UNA SOLA PAGINA
-  productos: Producto[] = [];
-
-  ngOnInit() {
-    console.log('iniciando');
-    this.api.get<Producto[]>(this.url+'/lista-productos').subscribe({
-      next: data => this.productos = data,
-      error: error => console.error('Error al obtener productos', error)
-    });
-  }
-}
 
 export interface Producto {
   id: number;
   nombre: string;
   descripcion: string;
   precio: number;
+  plataforma: string;
+  duracionDias: number;
+  categoriaId?: number;
+}
+
+@Component({
+  selector: 'app-productos',
+  standalone: true,
+  imports: [CommonModule, RouterLink],
+  templateUrl: './productos.html'
+})
+export class Productos implements OnInit {
+  private api = inject(ApiClient);
+  private router = inject(Router);
+
+  productos: Producto[] = [];
+  username: string = '';
+  rol: string = '';
+  mensaje: string = '';
+  mensajeError: boolean = false;
+  productosEnCarrito: Set<number> = new Set();
+
+  ngOnInit() {
+    const usuarioGuardado = localStorage.getItem('usuario');
+    if (usuarioGuardado) {
+      const usuario = JSON.parse(usuarioGuardado);
+      this.username = usuario.user;
+      this.rol = usuario.rol || 'Cliente';
+      this.cargarProductos();
+      this.cargarCarrito();
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
+
+  cargarProductos() {
+    this.api.getProductos().subscribe({
+      next: (data: Producto[]) => {
+        this.productos = data;
+        console.log('Productos cargados:', data);
+      },
+      error: (error: any) => {
+        console.error('Error al obtener productos:', error);
+        this.mensaje = 'Error al cargar productos';
+        this.mensajeError = true;
+      }
+    });
+  }
+
+  cargarCarrito() {
+    if (this.rol !== 'Cliente' && this.rol !== 'ClienteVip') return;
+    
+    this.api.verCarrito(this.username).subscribe({
+      next: (data: any[]) => {
+        this.productosEnCarrito = new Set(data.map(item => item.id));
+      },
+      error: (error: any) => {
+        console.error('Error al cargar carrito:', error);
+      }
+    });
+  }
+
+  agregarAlCarrito(productoId: number, productoNombre: string) {
+    if (this.rol === 'Admin') {
+      this.mensaje = 'Los administradores no pueden comprar productos';
+      this.mensajeError = true;
+      return;
+    }
+
+    if (!this.username) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.api.agregarAlCarrito(this.username, productoId).subscribe({
+      next: (response: any) => {
+        this.productosEnCarrito.add(productoId);
+        this.mensaje = response.mensaje || 'Producto agregado al carrito';
+        this.mensajeError = false;
+        setTimeout(() => this.mensaje = '', 3000);
+      },
+      error: (error: any) => {
+        console.error('Error al agregar al carrito:', error);
+        this.mensaje = 'Error al agregar producto al carrito';
+        this.mensajeError = true;
+        setTimeout(() => this.mensaje = '', 3000);
+      }
+    });
+  }
+
+  estaEnCarrito(productoId: number): boolean {
+    return this.productosEnCarrito.has(productoId);
+  }
+
+  irAlCarrito() {
+    this.router.navigate(['/carrito']);
+  }
+
+  esAdmin(): boolean {
+    return this.rol === 'Admin';
+  }
 }

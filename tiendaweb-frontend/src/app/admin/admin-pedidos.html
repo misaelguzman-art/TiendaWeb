@@ -1,0 +1,50 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Gestión de Pedidos</h2>
+  </div>
+
+  <div *ngIf="cargando" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <div *ngIf="mensaje" class="alert alert-danger">
+    {{ mensaje }}
+  </div>
+
+  <div *ngIf="!cargando && pedidos.length === 0" class="text-center py-5">
+    <h4>No hay pedidos registrados en el sistema</h4>
+  </div>
+
+  <div *ngIf="!cargando && pedidos.length > 0" class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>ID Pedido</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Cant. Items</th>
+            <th>Total</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pedido of pedidos">
+            <td><strong>#{{ pedido.id }}</strong></td>
+            <td>{{ formatearFecha(pedido.fechaPedido) }}</td>
+            <td>{{ pedido.usuario.user }}</td>
+            <td>{{ pedido.cantidadItems }}</td>
+            <td class="text-primary fw-bold">${{ pedido.total.toFixed(2) }}</td>
+            <td>
+              <span class="badge" [ngClass]="pedido.estado === 'Pagado' ? 'bg-success' : 'bg-warning text-dark'">
+                {{ pedido.estado }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

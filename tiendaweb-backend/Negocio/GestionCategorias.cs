@@ -1,16 +1,18 @@
+using System.Collections.Generic;
+using tiendaweb_backend.Datos;
+
+namespace tiendaweb_backend.Negocio;
+
 public class GestionCategorias
 {
     public List<Categoria> ListaCategorias()
     {
         var result = new List<Categoria>
         {
-             new() {Id =1 ,Nombre = "Hardware",Descripcion = "Todo lo relacionado con hardware"},
-             new() {Id =2 ,Nombre = "Software",Descripcion = "Todo lo relacionado con software"},
-             new() {Id =3 ,Nombre = "Perifericos",Descripcion = "Todo lo relacionado con perifericos"}
+            new() {Id = 1, Nombre = "Streaming"}, // ← SIN DESCRIPCION
+            new() {Id = 2, Nombre = "Software"}   // ← SIN DESCRIPCION
         };
 
         return result;
     }
-
-
 }

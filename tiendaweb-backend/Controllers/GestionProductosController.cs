@@ -8,11 +8,11 @@ namespace tiendaweb_backend.Controllers;
 [Route("[controller]")]
 public class GestionProductosController : ControllerBase
 {
-    private GestionProductos _gestionProductos;
+    private readonly GestionProductos _gestionProductos;
 
-    public GestionProductosController()
+    public GestionProductosController(GestionProductos gestionProductos)
     {
-        _gestionProductos = new GestionProductos();
+        _gestionProductos = gestionProductos;
     }
 
     [HttpGet("lista-productos")]
@@ -20,4 +20,42 @@ public class GestionProductosController : ControllerBase
     {
         return _gestionProductos.ListaProductos();
     }
+
+    [HttpGet("categoria/{categoriaId}")]
+    public IEnumerable<Producto> ListaPorCategoria(int categoriaId)
+    {
+        return _gestionProductos.ListarPorCategoria(categoriaId);
+    }
+
+    [HttpPost("crear-producto")]
+    public void CrearProducto(ProductoDigital producto)
+    {
+        _gestionProductos.crearProducto(producto);
+    }
+
+    [HttpPut("actualizar-producto/{id}")]
+    public IActionResult ActualizarProducto(int id, [FromBody] ProductoDigital producto)
+    {
+        _gestionProductos.ActualizarProducto(id, producto);
+        return Ok(new { mensaje = "Producto actualizado con éxito." });
+    }
+
+    [HttpDelete("eliminar-producto/{id}")]
+    public IActionResult EliminarProducto(int id)
+    {
+        bool eliminado = _gestionProductos.EliminarProducto(id);
+        if (eliminado)
+            return Ok(new { mensaje = "Producto eliminado con éxito." });
+        else
+            return NotFound("Producto no encontrado.");
+    }
+
+
+     [HttpGet("comentarios/{productoId}")]
+    public IEnumerable<Comentarios> ListaComentariosPorProducto(int productoId)
+    {
+        return _gestionProductos.ListaComentariosPorProducto(productoId);
+    }
+
+
 }

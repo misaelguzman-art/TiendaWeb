@@ -1,37 +1,72 @@
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-10">
-
-      <h1>Productos</h1>
-      <br/>
-      <button type="button" class="btn btn-primary" routerLink="/producto">Nuevo producto</button>
-      <br/>
-      <table class="table table-hover">
-        <thead>
-        <tr>
-          <th scope="col"># Codigo</th>
-          <th scope="col">Nombre</th>
-          <th scope="col">Precio</th>
-          <th scope="col">Acciones</th>
-        </tr>
-        </thead>
-        <tbody class="table-group-divider">
-          @for (producto of productos; track producto.id) {
-            <tr>
-              <th scope="row">{{ producto.id }}</th>
-              <td>{{ producto.nombre }}</td>
-              <td>{{ producto.precio }}</td>
-              <td>
-                <div class="btn-group" role="group" aria-label="Basic outlined example">
-                  <button type="button" class="btn btn-outline-primary">Editar</button>
-                  <button type="button" class="btn btn-outline-secondary">Eliminar</button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Productos Digitales</h2>
+    <div>
+      <button class="btn btn-outline-primary me-2" (click)="irAlCarrito()" *ngIf="!esAdmin()">
+        Ver Carrito
+      </button>
+      <button class="btn btn-primary" routerLink="/producto/nuevo" *ngIf="esAdmin()">
+        Agregar Producto
+      </button>
     </div>
   </div>
+
+  <!-- Mensaje de feedback -->
+  <div *ngIf="mensaje" [class]="mensajeError ? 'alert alert-danger' : 'alert alert-success'" class="mt-2">
+    {{ mensaje }}
+  </div>
+
+  <!-- Grid de productos -->
+  <div class="row">
+    <div class="col-md-4 mb-4" *ngFor="let producto of productos">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">
+            {{ producto.nombre }}
+            <span *ngIf="producto.categoriaId === -1" class="badge bg-danger ms-2">VENDIDO</span>
+          </h5>
+          <p class="card-text text-muted">{{ producto.descripcion }}</p>
+          <p class="card-text">
+            <small>Plataforma: {{ producto.plataforma || 'N/A' }}</small>
+          </p>
+          <p class="card-text">
+            <small>Duracion: {{ producto.duracionDias || 30 }} dias</small>
+          </p>
+          <h4 class="text-primary">${{ producto.precio }}</h4>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <div class="d-grid gap-2">
+            <button 
+              *ngIf="!esAdmin()"
+              class="btn" 
+              [ngClass]="producto.categoriaId === -1 ? 'btn-outline-danger' : (estaEnCarrito(producto.id) ? 'btn-secondary' : 'btn-success')"
+              [disabled]="estaEnCarrito(producto.id) || producto.categoriaId === -1"
+              (click)="agregarAlCarrito(producto.id, producto.nombre)">
+              {{ producto.categoriaId === -1 ? 'Agotado' : (estaEnCarrito(producto.id) ? 'En Carrito' : 'Agregar al Carrito') }}
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" [routerLink]="['/producto', producto.id]">
+              Ver Detalle
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje cuando no hay productos -->
+  <div *ngIf="productos.length === 0" class="text-center py-5">
+    <h4>No hay productos disponibles</h4>
+    <p class="text-muted">Agrega un nuevo producto desde el boton "Agregar Producto"</p>
+  </div>
 </div>
+
+<style>
+  .card {
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+</style>

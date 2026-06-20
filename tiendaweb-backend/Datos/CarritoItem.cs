@@ -3,15 +3,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace tiendaweb_backend.Datos;
 
-public class Categoria
+public class CarritoItem
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     
-    [Required]
-    public string Nombre { get; set; } = string.Empty;
+    public int UsuarioId { get; set; }
+    public int ProductoId { get; set; }
+    public int Cantidad { get; set; } = 1;
     
     // Propiedades de navegación
-    public List<Producto> Productos { get; set; } = new();
+    public Usuario Usuario { get; set; } = null!;
+    public Producto Producto { get; set; } = null!;
 }

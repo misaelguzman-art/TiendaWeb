@@ -1,0 +1,127 @@
+<div class="container py-4">
+  <!-- Vista de códigos de activación -->
+  <div *ngIf="mostrarCodigosActivacion" class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card border-success shadow-lg">
+        <div class="card-header bg-success text-white">
+          <h3 class="mb-0">¡Compra Exitosa!</h3>
+        </div>
+        <div class="card-body">
+          <p class="fs-5 mb-4">Tus códigos de activación están listos. Guárdalos en un lugar seguro.</p>
+          
+          <div *ngFor="let codigo of codigosActivacion; let i = index" class="card mb-3 border-primary">
+            <div class="card-body">
+              <h6 class="card-title">{{ codigo.nombreProducto }}</h6>
+              <div class="input-group">
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [value]="codigo.codigo" 
+                  readonly>
+                <button 
+                  class="btn btn-primary" 
+                  type="button" 
+                  (click)="copiarCodigo(codigo.codigo)">
+                  Copiar
+                </button>
+              </div>
+              <small class="text-muted d-block mt-2">Precio: ${{ codigo.precio }}</small>
+            </div>
+          </div>
+
+          <div class="alert alert-info" role="alert">
+            <strong>Tip:</strong> Puedes usar estos códigos inmediatamente en la plataforma correspondiente.
+          </div>
+
+          <div class="mt-4">
+            <button class="btn btn-primary btn-lg w-100" (click)="regresarProductos()">
+              Seguir Comprando
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vista normal del carrito -->
+  <div *ngIf="!mostrarCodigosActivacion">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Carrito de Compras</h2>
+      <button class="btn btn-outline-secondary" routerLink="/productos">
+        Seguir Comprando
+      </button>
+    </div>
+
+    <!-- Mensaje de feedback -->
+    <div *ngIf="mensaje" [class]="mensajeError ? 'alert alert-danger' : 'alert alert-success'" role="alert">
+      {{ mensaje }}
+    </div>
+
+    <!-- Carrito vacío -->
+    <div *ngIf="items.length === 0" class="text-center py-5">
+      <h4>El carrito está vacío</h4>
+      <p class="text-muted">Explora nuestros productos y agrega lo que desees.</p>
+      <a routerLink="/productos" class="btn btn-primary btn-lg">Ver Productos</a>
+    </div>
+
+    <!-- Carrito con items -->
+    <div *ngIf="items.length > 0">
+      <!-- Lista de items -->
+      <div class="card mb-3" *ngFor="let item of items">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <h5 class="card-title">{{ item.nombre }}</h5>
+              <p class="card-text text-muted">{{ item.descripcion }}</p>
+              <p class="card-text">
+                <small>Plataforma: {{ item.plataforma || 'N/A' }}</small><br>
+                <small>Duración: {{ item.duracionDias || 30 }} días</small>
+              </p>
+            </div>
+            <div class="col-md-3">
+              <h5 class="text-primary">${{ item.precio }}</h5>
+            </div>
+            <div class="col-md-3 text-end">
+              <button class="btn btn-danger btn-sm" (click)="eliminarItem(item.id)">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen -->
+      <div class="card" [ngClass]="esPremium() ? 'border-warning bg-light-warning' : ''">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h5>Resumen de Compra</h5>
+              <p>Total items: <strong>{{ items.length }}</strong></p>
+              <p *ngIf="subtotal > 0">
+                Subtotal: <strong>${{ subtotal.toFixed(2) }}</strong>
+              </p>
+              <p *ngIf="descuentoPorcentaje > 0" class="text-success">
+                <strong>Descuento VIP: {{ descuentoPorcentaje }}%</strong>
+              </p>
+            </div>
+            <div class="col-md-6 text-end">
+              <div *ngIf="descuentoPorcentaje > 0" class="alert alert-success mb-3">
+                <strong>¡Eres Cliente VIP!</strong><br>
+                Disfrutas de 20% de descuento
+              </div>
+              <h3>Total: <strong class="text-primary">${{ total.toFixed(2) }}</strong></h3>
+              <div class="mt-3 d-grid gap-2">
+                <button class="btn btn-success btn-lg" (click)="realizarCompra()" [disabled]="comprando || items.length === 0">
+                  {{ comprando ? 'Procesando...' : 'Comprar Ahora' }}
+                </button>
+                <button class="btn btn-outline-danger" (click)="vaciarCarrito()">
+                  Vaciar Carrito
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
