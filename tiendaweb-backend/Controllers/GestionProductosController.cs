@@ -43,11 +43,18 @@ public class GestionProductosController : ControllerBase
     [HttpDelete("eliminar-producto/{id}")]
     public IActionResult EliminarProducto(int id)
     {
-        bool eliminado = _gestionProductos.EliminarProducto(id);
-        if (eliminado)
-            return Ok(new { mensaje = "Producto eliminado con éxito." });
-        else
-            return NotFound("Producto no encontrado.");
+        try
+        {
+            bool eliminado = _gestionProductos.EliminarProducto(id);
+            if (eliminado)
+                return Ok(new { mensaje = "Producto eliminado con éxito." });
+            else
+                return NotFound(new { mensaje = "Producto no encontrado." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { mensaje = ex.Message });
+        }
     }
 
 

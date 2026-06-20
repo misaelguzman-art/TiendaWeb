@@ -71,16 +71,27 @@
               <input type="number" class="form-control" [(ngModel)]="producto.precio" name="precio" required min="0">
             </div>
 
-            <!-- Plataforma -->
+            <!-- Categoría -->
             <div class="mb-3">
-              <label class="form-label fw-bold">Plataforma</label>
-              <input type="text" class="form-control" [(ngModel)]="producto.plataforma" name="plataforma" placeholder="Ej: Netflix, HBO, Spotify">
+              <label class="form-label fw-bold">Categoría</label>
+              <select class="form-select" [(ngModel)]="producto.categoriaId" name="categoriaId" required>
+                <option [ngValue]="undefined" disabled>Selecciona una categoría...</option>
+                <option *ngFor="let cat of categorias" [ngValue]="cat.id">
+                  {{ cat.nombre }}
+                </option>
+              </select>
             </div>
 
             <!-- Duración -->
-            <div class="mb-4">
+            <div class="mb-3">
               <label class="form-label fw-bold">Duración (Días)</label>
               <input type="number" class="form-control" [(ngModel)]="producto.duracionDias" name="duracionDias" min="1">
+            </div>
+
+            <!-- Código de Activación -->
+            <div class="mb-4" *ngIf="!esEdicion">
+              <label class="form-label fw-bold text-success">Código de Activación (Opcional)</label>
+              <input type="text" class="form-control border-success" [(ngModel)]="producto.codigoDescarga" name="codigoDescarga" placeholder="Ej: XXXX-YYYY-ZZZZ (Si lo dejas en blanco se autogenerará)">
             </div>
 
             <!-- Botones -->

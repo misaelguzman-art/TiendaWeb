@@ -20,7 +20,7 @@
           <div class="col-md-6">
             <div class="mb-3">
               <label class="form-label">Precio</label>
-              <input type="number" class="form-control" [(ngModel)]="productoForm.precio" name="precio" required>
+              <input type="number" class="form-control" [(ngModel)]="productoForm.precio" name="precio" required min="0">
             </div>
           </div>
         </div>
@@ -31,14 +31,19 @@
         <div class="row">
           <div class="col-md-6">
             <div class="mb-3">
-              <label class="form-label">Plataforma</label>
-              <input type="text" class="form-control" [(ngModel)]="productoForm.plataforma" name="plataforma">
+              <label class="form-label">Categoria</label>
+              <select class="form-select" [(ngModel)]="productoForm.categoriaId" name="categoriaId" required>
+                <option [ngValue]="undefined" disabled>Selecciona una categoria...</option>
+                <option *ngFor="let cat of categorias" [ngValue]="cat.id">
+                  {{ cat.nombre }}
+                </option>
+              </select>
             </div>
           </div>
           <div class="col-md-6">
             <div class="mb-3">
               <label class="form-label">Duracion (Dias)</label>
-              <input type="number" class="form-control" [(ngModel)]="productoForm.duracionDias" name="duracionDias">
+              <input type="number" class="form-control" [(ngModel)]="productoForm.duracionDias" name="duracionDias" min="1" required>
             </div>
           </div>
         </div>

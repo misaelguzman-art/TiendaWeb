@@ -29,6 +29,7 @@ export class Productos implements OnInit {
   mensaje: string = '';
   mensajeError: boolean = false;
   productosEnCarrito: Set<number> = new Set();
+  categoriasMap: Map<number, string> = new Map();
 
   ngOnInit() {
     const usuarioGuardado = localStorage.getItem('usuario');
@@ -36,11 +37,21 @@ export class Productos implements OnInit {
       const usuario = JSON.parse(usuarioGuardado);
       this.username = usuario.user;
       this.rol = usuario.rol || 'Cliente';
-      this.cargarProductos();
-      this.cargarCarrito();
+    this.cargarCategorias();
+    this.cargarProductos();
+    this.cargarCarrito();
     } else {
       this.router.navigate(['/login']);
     }
+  }
+
+  cargarCategorias() {
+    this.api.get<{id: number, nombre: string}[]>('/GestionCategorias/lista-categorias').subscribe({
+      next: (data) => {
+        this.categoriasMap = new Map(data.map(c => [c.id, c.nombre]));
+      },
+      error: () => {}
+    });
   }
 
   cargarProductos() {
@@ -104,6 +115,11 @@ export class Productos implements OnInit {
 
   irAlCarrito() {
     this.router.navigate(['/carrito']);
+  }
+
+  nombreCategoria(categoriaId?: number): string {
+    if (!categoriaId || categoriaId === -1) return 'N/A';
+    return this.categoriasMap.get(categoriaId) ?? 'N/A';
   }
 
   esAdmin(): boolean {

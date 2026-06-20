@@ -28,10 +28,10 @@
           </h5>
           <p class="card-text text-muted">{{ producto.descripcion }}</p>
           <p class="card-text">
-            <small>Plataforma: {{ producto.plataforma || 'N/A' }}</small>
+            <small>Categoría: {{ nombreCategoria(producto.categoriaId) }}</small>
           </p>
           <p class="card-text">
-            <small>Duracion: {{ producto.duracionDias || 30 }} dias</small>
+            <small>Duración: {{ producto.duracionDias }} días</small>
           </p>
           <h4 class="text-primary">${{ producto.precio }}</h4>
         </div>

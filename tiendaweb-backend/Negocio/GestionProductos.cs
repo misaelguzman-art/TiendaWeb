@@ -74,10 +74,13 @@ public class GestionProductos
         {
             producto.Nombre = productoActualizado.Nombre;
             producto.Descripcion = productoActualizado.Descripcion;
-            producto.Precio = productoActualizado.Precio;
-            producto.Plataforma = productoActualizado.Plataforma;
-            producto.DuracionDias = productoActualizado.DuracionDias;
-            
+
+            // Precio: no permitir negativos
+            producto.Precio = productoActualizado.Precio < 0 ? 0 : productoActualizado.Precio;
+
+            // Duración: no permitir negativos ni cero, mínimo 1 día
+            producto.DuracionDias = productoActualizado.DuracionDias < 1 ? 1 : productoActualizado.DuracionDias;
+
             if (productoActualizado.CategoriaId > 0)
             {
                 producto.CategoriaId = productoActualizado.CategoriaId;
@@ -107,6 +110,24 @@ public class GestionProductos
         
         if (producto != null)
         { 
+            // Check if product is part of any orders
+            var tienePedidos = _context.DetallesPedido.Any(d => d.ProductoId == id);
+            if (tienePedidos)
+            {
+                // Throw an exception so the controller can catch it and return a friendly error
+                throw new Exception("No se puede eliminar un producto que ya ha sido vendido.");
+            }
+
+            // Remove related entities
+            var codigos = _context.CodigosActivacion.Where(c => c.ProductoId == id).ToList();
+            _context.CodigosActivacion.RemoveRange(codigos);
+
+            var comentarios = _context.Comentarios.Where(c => c.ProductoId == id).ToList();
+            _context.Comentarios.RemoveRange(comentarios);
+
+            var carritoItems = _context.CarritoItems.Where(c => c.ProductoId == id).ToList();
+            _context.CarritoItems.RemoveRange(carritoItems);
+
             _context.Productos.Remove(producto);
             _context.SaveChanges();
             return true;

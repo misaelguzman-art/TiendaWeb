@@ -13,6 +13,7 @@ export interface ProductoItem {
   plataforma: string;
   duracionDias: number;
   categoriaId?: number;
+  codigoDescarga?: string;
 }
 
 @Component({
@@ -39,6 +40,7 @@ export class Producto implements OnInit {
   mensajeError = false;
   username = '';
   mostrarComentarios = false;
+  categorias: {id: number, nombre: string}[] = [];
 
   ngOnInit(): void {
     const usuarioGuardado = localStorage.getItem('usuario');
@@ -46,6 +48,8 @@ export class Producto implements OnInit {
       const usuario = JSON.parse(usuarioGuardado);
       this.username = usuario.user;
     }
+
+    this.cargarCategorias();
 
     // Verificar si es edición (tiene ID en la URL)
     this.route.params.subscribe(params => {
@@ -58,6 +62,18 @@ export class Producto implements OnInit {
         this.esEdicion = false;
         this.mostrarComentarios = false;
       }
+    });
+  }
+
+  cargarCategorias() {
+    this.api.get<any[]>('/GestionCategorias/lista-categorias').subscribe({
+      next: data => {
+        // Filtrar solo Software (2) y Streaming (1) o dejar todas.
+        // El usuario pidió "solo permita poner software y streaming",
+        // así que traemos la lista que ya tiene esas dos.
+        this.categorias = data;
+      },
+      error: error => console.error('Error al cargar categorias:', error)
     });
   }
 

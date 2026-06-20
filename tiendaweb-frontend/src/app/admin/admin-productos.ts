@@ -30,8 +30,18 @@ export class AdminProductos implements OnInit {
     categoriaId: 0
   };
 
+  categorias: {id: number, nombre: string}[] = [];
+
   ngOnInit() {
     this.cargarProductos();
+    this.cargarCategorias();
+  }
+
+  cargarCategorias() {
+    this.api.get<any[]>('/GestionCategorias/lista-categorias').subscribe({
+      next: (data) => this.categorias = data,
+      error: (err) => console.error('Error al cargar categorias', err)
+    });
   }
 
   cargarProductos() {
@@ -85,6 +95,12 @@ export class AdminProductos implements OnInit {
     this.editando = true;
     this.mostrarFormulario = true;
     this.productoForm = { ...producto };
+
+    // Si el producto estaba marcado como VENDIDO (-1), 
+    // forzamos automáticamente a la primera categoría disponible para que vuelva a estar a la venta
+    if (this.productoForm.categoriaId === -1 && this.categorias && this.categorias.length > 0) {
+      this.productoForm.categoriaId = this.categorias[0].id;
+    }
   }
 
   cancelarEdicion() {
@@ -103,8 +119,7 @@ export class AdminProductos implements OnInit {
           setTimeout(() => this.mensaje = '', 3000);
         },
         error: (error: any) => {
-          console.error('Error al eliminar producto:', error);
-          this.mensaje = 'Error al eliminar producto';
+          this.mensaje = error.error?.mensaje || 'Error al eliminar producto';
           this.mensajeError = true;
         }
       });
